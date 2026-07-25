@@ -1,0 +1,253 @@
+# ============================================================
+# NOVYRA OS - Git Ignore Configuration
+# ============================================================
+# This file tells Git which files and folders should NOT be
+# tracked or uploaded to GitHub.
+# ============================================================
+
+
+# ============================================================
+# 1. PYTHON VIRTUAL ENVIRONMENT
+# ============================================================
+
+# Local Python virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+
+# ============================================================
+# 2. PYTHON CACHE AND COMPILED FILES
+# ============================================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python compiled extension files
+*.pyd
+
+# Python cache directories
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Coverage files
+.coverage
+.coverage.*
+htmlcov/
+
+# Test reports
+pytest-report.html
+
+
+# ============================================================
+# 3. JUPYTER NOTEBOOK FILES
+# ============================================================
+
+.ipynb_checkpoints/
+
+
+# ============================================================
+# 4. ENVIRONMENT VARIABLES AND SECRETS
+# ============================================================
+
+# Environment variable files
+.env
+.env.*
+!.env.example
+
+# Local secrets
+secrets/
+*.secret
+*.secrets
+
+# API keys and credentials
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Credential files
+credentials.json
+service-account.json
+
+
+# ============================================================
+# 5. DATABASE FILES
+# ============================================================
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Local database backups
+*.bak
+
+# Database temporary files
+*.db-journal
+*.db-wal
+*.db-shm
+
+
+# ============================================================
+# 6. LOG FILES
+# ============================================================
+
+*.log
+logs/
+
+
+# ============================================================
+# 7. OPERATING SYSTEM FILES
+# ============================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+
+# ============================================================
+# 8. VS CODE
+# ============================================================
+
+# VS Code workspace-specific files
+*.code-workspace
+
+# Keep the project's shared .vscode configuration
+# but ignore local machine-specific files
+.vscode/*.log
+.vscode/.ropeproject
+.vscode/settings.local.json
+
+
+# ============================================================
+# 9. IDE FILES
+# ============================================================
+
+# JetBrains IDEs
+.idea/
+
+# Visual Studio
+.vs/
+
+# Build directories
+bin/
+obj/
+
+
+# ============================================================
+# 10. BUILD AND DISTRIBUTION FILES
+# ============================================================
+
+build/
+dist/
+*.egg-info/
+
+# Python packaging
+*.whl
+
+
+# ============================================================
+# 11. TEMPORARY FILES
+# ============================================================
+
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Backup files
+*.bak
+*.old
+*.orig
+
+# Temporary editor files
+*.~
+
+
+# ============================================================
+# 12. PROJECT-SPECIFIC TEMPORARY DIRECTORIES
+# ============================================================
+
+# Temporary working files
+temp/
+tmp/
+
+# Local exports
+exports/
+
+# Generated reports
+generated_reports/
+
+
+# ============================================================
+# 13. NOVYRA OS LOCAL BACKUPS
+# ============================================================
+
+# Ignore local backup files generated during development.
+# The 08_BACKUPS folder itself remains in the repository,
+# but temporary backup archives should not be committed.
+
+08_BACKUPS/*.zip
+08_BACKUPS/*.7z
+08_BACKUPS/*.rar
+08_BACKUPS/*.tar
+08_BACKUPS/*.tar.gz
+
+
+# ============================================================
+# 14. LARGE GENERATED FILES
+# ============================================================
+
+# Machine learning model files
+*.pt
+*.pth
+*.onnx
+*.h5
+*.hdf5
+*.safetensors
+
+# Large data files
+*.parquet
+*.feather
+
+# Large archives
+*.zip
+*.7z
+*.rar
+
+
+# ============================================================
+# 15. GENERATED PYTHON DISTRIBUTION FILES
+# ============================================================
+
+*.manifest
+*.spec
+
+
+# ============================================================
+# 16. LOCAL CONFIGURATION
+# ============================================================
+
+# Local development configuration
+config.local.*
+settings.local.*
+
+# Local machine configuration
+machine.local.*
+
+
+# ============================================================
+# END OF NOVYRA OS GITIGNORE
+# ============================================================
