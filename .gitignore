@@ -251,3 +251,8 @@ machine.local.*
 # ============================================================
 # END OF NOVYRA OS GITIGNORE
 # ============================================================
+# Environment files
+.env
+*.env
+!.env.example
+!04_CONFIGURATION/environment/*.env.example
