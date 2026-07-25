@@ -5,9 +5,9 @@
             "name": "NOVYRA OS - Run Main Application",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}\\02_SOURCE_CODE\\app\\main.py",
+            "module": "app.main",
+            "cwd": "${workspaceFolder}\\02_SOURCE_CODE",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
             "justMyCode": true
         }
     ]

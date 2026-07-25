@@ -6,10 +6,11 @@
             "type": "process",
             "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
             "args": [
-                "${workspaceFolder}\\02_SOURCE_CODE\\app\\main.py"
+                "-m",
+                "app.main"
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}\\02_SOURCE_CODE"
             },
             "group": {
                 "kind": "build",

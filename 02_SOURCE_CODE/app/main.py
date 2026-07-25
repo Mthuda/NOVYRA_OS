@@ -1,30 +1,27 @@
 """
 NOVYRA OS
-Main Application Entry Point
+Phase 2 - Core Application Skeleton
 
-Purpose:
-    This file is the initial entry point for the NOVYRA OS system.
-
-Author:
-    Sibusiso November
-
-Project:
-    NOVYRA OS
-
-Stage:
-    Stage 1 - Development Environment Setup
+This is the main entry point for the application.
 """
 
+from app.core.logging_setup import setup_logging
+from app.core.config import get_app_config
 
-def main():
-    """Run the initial NOVYRA OS environment test."""
+
+def main() -> None:
+    """
+    Main entry point for NOVYRA OS.
+    """
+    setup_logging()
+    config = get_app_config()
 
     print("=" * 50)
     print("NOVYRA OS")
     print("=" * 50)
-    print("System Status: ONLINE")
-    print("Python Environment: ACTIVE")
-    print("Development Environment: READY")
+    print(f"Project Name: {config.project_name}")
+    print(f"Environment: {config.environment}")
+    print(f"Debug Mode: {config.debug}")
     print("=" * 50)
 
 

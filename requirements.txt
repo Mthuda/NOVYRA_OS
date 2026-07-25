@@ -1,0 +1,4 @@
+# NOVYRA OS - Runtime and development dependencies
+# Add only what the application actually needs.
+
+pytest>=8.0.0
