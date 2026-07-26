@@ -1,30 +1,30 @@
 """
-NOVYRA OS
-Phase 2 - Core Application Skeleton
-
-This is the main entry point for the application.
+Main entry point for NOVYRA OS.
 """
 
-from app.core.logging_setup import setup_logging
 from app.core.config import get_app_config
-from app.core.project_info import PROJECT_NAME, PROJECT_VERSION, PROJECT_STAGE
+from app.core.logging_setup import setup_logging
+from app.services.system_service import get_system_summary
 
 
 def main() -> None:
     """
-    Main entry point for NOVYRA OS.
+    Start the NOVYRA OS application.
     """
+
     setup_logging()
+
     config = get_app_config()
+    summary = get_system_summary(config)
 
     print("=" * 50)
-    print(PROJECT_NAME)
+    print(summary["project_name"])
     print("=" * 50)
-    print(f"Version: {PROJECT_VERSION}")
-    print(f"Stage: {PROJECT_STAGE}")
-    print(f"Project Name: {config.project_name}")
-    print(f"Environment: {config.environment}")
-    print(f"Debug Mode: {config.debug}")
+    print(f"Version: {summary['version']}")
+    print(f"Stage: {summary['stage']}")
+    print(f"Environment: {summary['environment']}")
+    print(f"Debug Mode: {summary['debug']}")
+    print(f"Project Root: {summary['project_root']}")
     print("=" * 50)
 
 
