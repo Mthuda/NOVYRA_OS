@@ -15,7 +15,21 @@ def main() -> None:
     setup_logging()
 
     config = get_app_config()
-    summary = get_system_summary(config)
+    result = get_system_summary(config)
+
+    if not result.success:
+        print(f"ERROR: {result.message}")
+
+        if result.error_code:
+            print(f"Error Code: {result.error_code}")
+
+        return
+
+    summary = result.data
+
+    if summary is None:
+        print("ERROR: System summary returned no data.")
+        return
 
     print("=" * 50)
     print(summary["project_name"])

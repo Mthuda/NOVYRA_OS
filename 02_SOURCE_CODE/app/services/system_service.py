@@ -1,8 +1,8 @@
 """
-System service for NOVYRA OS.
+System information service for NOVYRA OS.
 
-This module provides application-level operations related to
-system and project information.
+This module provides application-level system information
+through a consistent ServiceResult interface.
 """
 
 from app.core.config import AppConfig
@@ -12,20 +12,24 @@ from app.core.project_info import (
     PROJECT_STAGE,
     PROJECT_VERSION,
 )
+from app.core.service_result import ServiceResult
 
 
-def get_system_summary(config: AppConfig) -> dict[str, object]:
+def get_system_summary(
+    config: AppConfig,
+) -> ServiceResult[dict[str, object]]:
     """
     Build a summary of the current NOVYRA OS runtime.
 
     Args:
-        config: Current application configuration.
+        config:
+            Application configuration.
 
     Returns:
-        Dictionary containing project and runtime information.
+        ServiceResult containing system summary information.
     """
 
-    return {
+    summary = {
         "project_name": PROJECT_NAME,
         "version": PROJECT_VERSION,
         "stage": PROJECT_STAGE,
@@ -33,3 +37,8 @@ def get_system_summary(config: AppConfig) -> dict[str, object]:
         "debug": config.debug,
         "project_root": str(get_project_root()),
     }
+
+    return ServiceResult.ok(
+        data=summary,
+        message="System summary generated successfully.",
+    )
