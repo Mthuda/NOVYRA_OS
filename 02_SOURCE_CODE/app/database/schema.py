@@ -11,6 +11,9 @@ def initialize_database(connection: sqlite3.Connection) -> None:
     """
     Initialize the NOVYRA OS database schema.
 
+    The schema is intentionally idempotent, meaning this function can
+    safely be called multiple times without destroying existing data.
+
     Args:
         connection: Active SQLite database connection.
     """
@@ -21,7 +24,8 @@ def initialize_database(connection: sqlite3.Connection) -> None:
             id TEXT PRIMARY KEY,
             title TEXT NOT NULL,
             source TEXT NOT NULL,
-            description TEXT
+            description TEXT,
+            metadata TEXT NOT NULL DEFAULT '{}'
         )
         """
     )

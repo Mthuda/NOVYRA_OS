@@ -135,3 +135,41 @@ def test_initialize_database_is_idempotent(tmp_path):
         assert result["table_count"] == 1
     finally:
         connection.close()
+
+def test_database_file_is_created(tmp_path):
+    """Test that database initialization creates the SQLite database file."""
+
+    database_path = tmp_path / "novyra_os.db"
+
+    config = DatabaseConfig(
+        database_path=str(database_path),
+    )
+
+    connection = get_database_connection(config)
+
+    try:
+        initialize_database(connection)
+
+        assert database_path.exists()
+        assert database_path.is_file()
+    finally:
+        connection.close()
+
+def test_database_initialization_creates_database_file(tmp_path):
+    """Test that database initialization creates the SQLite database file."""
+
+    database_path = tmp_path / "novyra_os.db"
+
+    config = DatabaseConfig(
+        database_path=str(database_path),
+    )
+
+    connection = get_database_connection(config)
+
+    try:
+        initialize_database(connection)
+
+        assert database_path.exists()
+        assert database_path.is_file()
+    finally:
+        connection.close()

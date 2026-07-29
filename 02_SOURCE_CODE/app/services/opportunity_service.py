@@ -4,17 +4,46 @@ Opportunity service for NOVYRA OS.
 This module provides application-level operations for creating, retrieving,
 listing, and deleting Opportunity domain objects.
 
-The service layer coordinates domain models with the repository layer and
-returns standardized ServiceResult objects.
+The service layer coordinates domain models with repository implementations
+and returns standardized ServiceResult objects.
 """
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Protocol
 
 from app.core.service_result import ServiceResult
 from app.models.opportunity import Opportunity
-from app.repositories.opportunity_repository import OpportunityRepository
+
+
+class OpportunityRepositoryProtocol(Protocol):
+    """
+    Protocol defining the repository operations required by the service.
+
+    Both the in-memory repository and SQLite repository satisfy this protocol.
+    """
+
+    def save(self, opportunity: Opportunity) -> Opportunity:
+        """Save or replace an opportunity."""
+        ...
+
+    def get_by_id(
+        self,
+        opportunity_id: str,
+    ) -> Opportunity | None:
+        """Retrieve an opportunity by ID."""
+        ...
+
+    def list_all(self) -> list[Opportunity]:
+        """Return all opportunities."""
+        ...
+
+    def delete(
+        self,
+        opportunity_id: str,
+    ) -> bool:
+        """Delete an opportunity by ID."""
+        ...
 
 
 def create_opportunity(
@@ -23,7 +52,7 @@ def create_opportunity(
     source: str,
     description: str = "",
     metadata: dict[str, Any] | None = None,
-    repository: OpportunityRepository | None = None,
+    repository: OpportunityRepositoryProtocol | None = None,
 ) -> ServiceResult[Opportunity]:
     """
     Create and persist an Opportunity domain object.
@@ -34,12 +63,16 @@ def create_opportunity(
         source: Origin of the opportunity.
         description: Optional detailed description.
         metadata: Optional structured metadata.
-        repository: Optional repository instance used for persistence.
+        repository: Repository used for persistence.
 
     Returns:
         A ServiceResult containing the Opportunity on success.
+
+    Notes:
+        If no repository is supplied, the Opportunity is validated and
+        returned but is not persisted. Production callers should always
+        provide a repository.
     """
-    active_repository = repository or OpportunityRepository()
 
     try:
         opportunity = Opportunity(
@@ -50,7 +83,8 @@ def create_opportunity(
             metadata=metadata or {},
         )
 
-        active_repository.save(opportunity)
+        if repository is not None:
+            repository.save(opportunity)
 
         return ServiceResult.ok(
             data=opportunity,
@@ -66,7 +100,7 @@ def create_opportunity(
 
 def get_opportunity(
     opportunity_id: str,
-    repository: OpportunityRepository,
+    repository: OpportunityRepositoryProtocol,
 ) -> ServiceResult[Opportunity]:
     """
     Retrieve an Opportunity by its identifier.
@@ -79,6 +113,7 @@ def get_opportunity(
         A successful ServiceResult containing the Opportunity if found,
         otherwise a failure result.
     """
+
     opportunity = repository.get_by_id(opportunity_id)
 
     if opportunity is None:
@@ -94,7 +129,7 @@ def get_opportunity(
 
 
 def list_opportunities(
-    repository: OpportunityRepository,
+    repository: OpportunityRepositoryProtocol,
 ) -> ServiceResult[list[Opportunity]]:
     """
     Retrieve all stored opportunities.
@@ -105,6 +140,7 @@ def list_opportunities(
     Returns:
         A successful ServiceResult containing all stored opportunities.
     """
+
     opportunities = repository.list_all()
 
     return ServiceResult.ok(
@@ -115,7 +151,7 @@ def list_opportunities(
 
 def delete_opportunity(
     opportunity_id: str,
-    repository: OpportunityRepository,
+    repository: OpportunityRepositoryProtocol,
 ) -> ServiceResult[None]:
     """
     Delete an Opportunity by its identifier.
@@ -128,6 +164,7 @@ def delete_opportunity(
         A successful ServiceResult if the opportunity was deleted,
         otherwise a failure result.
     """
+
     deleted = repository.delete(opportunity_id)
 
     if not deleted:
