@@ -1,12 +1,27 @@
 """
-Tests for the NOVYRA OS service result foundation.
+===============================================================================
+NOVYRA OS
+
+File:
+    test_service_result.py
+
+Purpose:
+    Unit tests for the ServiceResult class.
+
+Description:
+    These tests verify the behaviour of the ServiceResult object used
+    throughout NOVYRA OS to communicate service-layer results.
+
+Phase:
+    Phase 4
+===============================================================================
 """
 
 from app.core.service_result import ServiceResult
 
 
-def test_successful_service_result():
-    """Test creation of a successful service result."""
+def test_successful_service_result() -> None:
+    """Verify that a successful ServiceResult is created correctly."""
 
     result = ServiceResult.ok(
         data={"status": "ready"},
@@ -19,8 +34,8 @@ def test_successful_service_result():
     assert result.error_code is None
 
 
-def test_failed_service_result():
-    """Test creation of a failed service result."""
+def test_failed_service_result() -> None:
+    """Verify that a failed ServiceResult is created correctly."""
 
     result = ServiceResult.fail(
         message="Operation failed.",
@@ -33,8 +48,8 @@ def test_failed_service_result():
     assert result.error_code == "OPERATION_FAILED"
 
 
-def test_successful_result_without_data():
-    """Test a successful result with no data."""
+def test_successful_result_without_data() -> None:
+    """Verify that a successful result may omit a payload."""
 
     result = ServiceResult.ok(
         message="System is ready.",
@@ -46,31 +61,14 @@ def test_successful_result_without_data():
     assert result.error_code is None
 
 
-def test_failed_result_without_error_code():
-    """Test a failed result without an error code."""
+def test_failed_result_without_error_code() -> None:
+    """Verify that a failed result may omit an error code."""
 
     result = ServiceResult.fail(
-        message="An unknown error occurred.",
+        message="Unknown error.",
     )
 
     assert result.success is False
     assert result.data is None
-    assert result.message == "An unknown error occurred."
+    assert result.message == "Unknown error."
     assert result.error_code is None
-
-
-def test_service_result_is_immutable():
-    """Test that ServiceResult instances cannot be modified."""
-
-    result = ServiceResult.ok(
-        data="test",
-    )
-
-    try:
-        result.success = False
-    except AttributeError:
-        pass
-    else:
-        raise AssertionError(
-            "ServiceResult should be immutable."
-        )

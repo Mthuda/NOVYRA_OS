@@ -1,13 +1,40 @@
 """
-Application configuration for NOVYRA OS.
+===============================================================================
+NOVYRA OS
 
-This module provides a central configuration object for the application.
-Configuration values are loaded from environment variables with safe
-development defaults.
+File:
+    config.py
+
+Purpose:
+    Centralised application configuration.
+
+Description:
+    Loads application configuration from environment variables and provides
+    a single immutable configuration object that can be shared throughout
+    the application.
+
+Responsibilities:
+    - Read environment variables
+    - Validate configuration values
+    - Convert text values into Python types
+    - Produce an immutable AppConfig object
+
+Phase:
+    Phase 4
+
+===============================================================================
 """
 
-from dataclasses import dataclass
+# =============================================================================
+# Imports
+# =============================================================================
+
 import os
+from dataclasses import dataclass
+
+# =============================================================================
+# Configuration Model
+# =============================================================================
 
 
 @dataclass(frozen=True)
@@ -16,9 +43,18 @@ class AppConfig:
     Immutable application configuration.
 
     Attributes:
-        project_name: Name of the application.
-        environment: Current runtime environment.
-        debug: Whether debug mode is enabled.
+        project_name:
+            Human-readable application name.
+
+        environment:
+            Current runtime environment such as:
+                - development
+                - testing
+                - staging
+                - production
+
+        debug:
+            Indicates whether debug mode is enabled.
     """
 
     project_name: str
@@ -26,25 +62,53 @@ class AppConfig:
     debug: bool
 
 
+# =============================================================================
+# Private Helper Functions
+# =============================================================================
+
+
 def _parse_bool(value: str) -> bool:
     """
     Convert a string environment variable into a boolean.
 
     Accepted true values:
-        1, true, yes, on
+
+        1
+        true
+        yes
+        on
 
     Accepted false values:
-        0, false, no, off
+
+        0
+        false
+        no
+        off
 
     Args:
-        value: Raw string value.
+        value:
+            Raw string value read from an environment variable.
 
     Returns:
         Parsed boolean value.
 
     Raises:
-        ValueError: If the value cannot be interpreted as a boolean.
+        ValueError:
+            If the supplied value cannot be interpreted as a boolean.
     """
+
+    # -------------------------------------------------------------------------
+    # Environment variables are always strings.
+    #
+    # Normalise the value before comparison so the application accepts
+    # different capitalisation such as:
+    #
+    #     TRUE
+    #     True
+    #     true
+    #
+    # while still producing the same boolean result.
+    # -------------------------------------------------------------------------
 
     normalized = value.strip().lower()
 
@@ -56,39 +120,70 @@ def _parse_bool(value: str) -> bool:
 
     raise ValueError(
         f"Invalid boolean value: {value!r}. "
-        "Expected one of: 1, 0, true, false, yes, no, on, off."
+        "Expected one of: "
+        "1, 0, true, false, yes, no, on, off."
     )
+
+
+# =============================================================================
+# Public Functions
+# =============================================================================
 
 
 def get_app_config() -> AppConfig:
     """
     Load application configuration from environment variables.
 
-    Environment variables:
+    Environment Variables
 
         NOVYRA_PROJECT_NAME
             Application name.
 
         NOVYRA_ENVIRONMENT
-            Runtime environment, for example:
-            development, testing, staging, production.
+            Runtime environment.
 
         NOVYRA_DEBUG
-            Controls debug mode.
+            Enables or disables debug mode.
 
     Returns:
-        AppConfig containing the application configuration.
+        Immutable AppConfig instance.
     """
+
+    # -------------------------------------------------------------------------
+    # Load the application name.
+    #
+    # A default value is provided so the application can start even when
+    # no environment variables have been configured.
+    # -------------------------------------------------------------------------
 
     project_name = os.getenv(
         "NOVYRA_PROJECT_NAME",
         "NOVYRA OS",
     ).strip()
 
+    # -------------------------------------------------------------------------
+    # Load the runtime environment.
+    #
+    # The value is converted to lowercase so that values such as:
+    #
+    #     Development
+    #     DEVELOPMENT
+    #     development
+    #
+    # are treated identically.
+    # -------------------------------------------------------------------------
+
     environment = os.getenv(
         "NOVYRA_ENVIRONMENT",
         "development",
     ).strip().lower()
+
+    # -------------------------------------------------------------------------
+    # Read the debug flag.
+    #
+    # Environment variables only contain text, therefore the value must be
+    # converted into a proper Python boolean.
+    # -------------------------------------------------------------------------
 
     debug_raw = os.getenv(
         "NOVYRA_DEBUG",
@@ -96,6 +191,11 @@ def get_app_config() -> AppConfig:
     )
 
     debug = _parse_bool(debug_raw)
+
+    # -------------------------------------------------------------------------
+    # Return a single immutable configuration object that will be shared
+    # across the application.
+    # -------------------------------------------------------------------------
 
     return AppConfig(
         project_name=project_name,
