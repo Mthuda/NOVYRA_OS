@@ -84,8 +84,8 @@ def test_system_summary() -> None:
     assert result.data is not None
 
     assert result.data["project_name"] == "NOVYRA OS"
-    assert result.data["version"] == "0.2.0"
-    assert result.data["stage"] == "Phase 3 - Persistence Foundation"
+    assert result.data["version"] == "0.3.0"
+    assert result.data["stage"] == "Phase 4 - Core Platform Services"
     assert result.data["environment"] == "development"
     assert result.data["debug"] is True
 

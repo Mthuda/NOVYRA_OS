@@ -9,48 +9,43 @@ Purpose:
     Application entry point.
 
 Description:
-    This module is responsible for starting the NOVYRA OS backend.
+    This module starts the NOVYRA OS application.
 
-    During startup it performs the following initialization sequence:
+    It is intentionally lightweight and acts only as an orchestrator.
 
-        1. Configure logging
-        2. Load application configuration
-        3. Load database configuration
-        4. Establish the database connection
-        5. Initialize the database schema
-        6. Collect system information
-        7. Display startup information
-        8. Shut down cleanly
+    Responsibilities include:
 
-    As NOVYRA grows, additional initialization tasks (AI services,
-    schedulers, background workers, API servers, and mobile integration)
-    will be added here while keeping the startup process organized.
+        • Configure application logging
+        • Initialize core platform services
+        • Display startup information
+        • Gracefully shut down resources
+
+    Business logic must never be implemented here.
+    All business operations belong inside the appropriate service layer.
 
 Phase:
-    Phase 4
+    Phase 4 – Core Platform Services
 
 ===============================================================================
 """
 
-# =============================================================================
-# Future Imports
-# =============================================================================
-
 from __future__ import annotations
 
 # =============================================================================
-# Application Imports
+# Imports
 # =============================================================================
 
 from app.core.config import get_app_config
-from app.core.database_config import get_database_config
 from app.core.logging_setup import setup_logging
-from app.database.connection import get_database_connection
-from app.database.schema import initialize_database
+from app.services.database_service import (
+    close_database,
+    get_database,
+    initialize,
+)
 from app.services.system_service import get_system_summary
 
 # =============================================================================
-# Application Entry Point
+# Main Application
 # =============================================================================
 
 
@@ -58,50 +53,64 @@ def main() -> None:
     """
     Start the NOVYRA OS application.
 
-    This function coordinates the complete application startup process.
-
-    Returns:
-        None
+    This function coordinates application startup and shutdown while
+    delegating all operational work to the service layer.
     """
 
     # -------------------------------------------------------------------------
-    # Configure the application's logging system before performing any work.
+    # Configure application logging.
     # -------------------------------------------------------------------------
 
     setup_logging()
 
     # -------------------------------------------------------------------------
-    # Load runtime configuration from environment variables.
+    # Load application configuration.
     # -------------------------------------------------------------------------
 
     config = get_app_config()
 
     # -------------------------------------------------------------------------
-    # Load database configuration and establish the SQLite connection.
+    # Initialize the database.
     # -------------------------------------------------------------------------
 
-    database_config = get_database_config()
+    database_result = initialize()
 
-    database_connection = get_database_connection(
-        database_config,
-    )
+    if not database_result.success:
+        print(f"ERROR: {database_result.message}")
+
+        if database_result.error_code:
+            print(f"Error Code: {database_result.error_code}")
+
+        return
+
+    # -------------------------------------------------------------------------
+    # Obtain the active database connection.
+    # -------------------------------------------------------------------------
+
+    connection_result = get_database()
+
+    if not connection_result.success:
+        print(f"ERROR: {connection_result.message}")
+
+        if connection_result.error_code:
+            print(f"Error Code: {connection_result.error_code}")
+
+        return
+
+    database_connection = connection_result.data
+
+    if database_connection is None:
+        print("ERROR: Database connection unavailable.")
+        return
 
     try:
-
         # ---------------------------------------------------------------------
-        # Ensure the database schema exists before services begin using it.
-        # ---------------------------------------------------------------------
-
-        initialize_database(database_connection)
-
-        # ---------------------------------------------------------------------
-        # Gather runtime information used for diagnostics and startup.
+        # Retrieve system information.
         # ---------------------------------------------------------------------
 
         result = get_system_summary(config)
 
         if not result.success:
-
             print(f"ERROR: {result.message}")
 
             if result.error_code:
@@ -116,7 +125,7 @@ def main() -> None:
             return
 
         # ---------------------------------------------------------------------
-        # Display application startup information.
+        # Display startup banner.
         # ---------------------------------------------------------------------
 
         print("=" * 50)
@@ -130,16 +139,18 @@ def main() -> None:
         print("=" * 50)
 
     finally:
-
         # ---------------------------------------------------------------------
-        # Always close the database connection to avoid resource leaks.
+        # Always close the database connection.
         # ---------------------------------------------------------------------
 
-        database_connection.close()
+        close_result = close_database(database_connection)
+
+        if not close_result.success:
+            print(f"WARNING: {close_result.message}")
 
 
 # =============================================================================
-# Script Entry Point
+# Program Entry Point
 # =============================================================================
 
 if __name__ == "__main__":

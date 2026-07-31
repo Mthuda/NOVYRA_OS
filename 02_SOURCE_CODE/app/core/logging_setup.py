@@ -6,75 +6,111 @@ File:
     logging_setup.py
 
 Purpose:
-    Central logging configuration.
+    Configure the NOVYRA OS logging system.
 
 Description:
-    Provides a single location responsible for configuring the application's
-    logging behaviour.
+    This module initializes the application's logging infrastructure.
 
-    Every component in NOVYRA—including services, repositories, database
-    infrastructure, REST APIs, desktop applications, and the future Kivy
-    mobile application—will use Python's built-in logging framework.
+    Logging is configured only once during application startup and provides:
 
-    Centralising logging ensures the entire application follows the same
-    formatting and log level configuration.
+        • Console logging
+        • File logging
+        • Consistent log formatting
+        • Automatic log directory creation
+
+    Every logger obtained through the logging service inherits this
+    configuration automatically.
+
+    Future enhancements may include:
+
+        • Log rotation
+        • JSON structured logging
+        • Remote logging
+        • Audit logging
+        • Security logging
 
 Phase:
-    Phase 4
+    Phase 4 – Core Platform Services
 
 ===============================================================================
 """
+
+from __future__ import annotations
 
 # =============================================================================
 # Imports
 # =============================================================================
 
 import logging
+from pathlib import Path
 
 # =============================================================================
-# Public Functions
+# Constants
+# =============================================================================
+
+LOG_DIRECTORY = Path("logs")
+LOG_FILE = LOG_DIRECTORY / "novyra.log"
+
+LOG_FORMAT = (
+    "%(asctime)s | "
+    "%(levelname)-8s | "
+    "%(name)s | "
+    "%(message)s"
+)
+
+# =============================================================================
+# Logging Setup
 # =============================================================================
 
 
-def setup_logging(level: int = logging.INFO) -> None:
+def setup_logging() -> None:
     """
-    Configure the application's logging system.
+    Configure the NOVYRA logging system.
 
-    This function should be called once during application startup before
-    any other modules begin writing log messages.
-
-    Args:
-        level:
-            Minimum logging level.
-
-            Common values include:
-
-                logging.DEBUG
-                logging.INFO
-                logging.WARNING
-                logging.ERROR
-                logging.CRITICAL
+    Calling this function multiple times is safe. Logging will only be
+    configured once.
     """
 
-    # -------------------------------------------------------------------------
-    # Configure the root logger.
-    #
-    # Every logger created throughout NOVYRA inherits this configuration unless
-    # explicitly overridden.
-    #
-    # The selected format includes:
-    #
-    #   • Timestamp
-    #   • Log level
-    #   • Logger name
-    #   • Log message
-    #
-    # Example:
-    #
-    #   2026-08-04 10:15:22 | INFO | app.services | Database initialised
-    # -------------------------------------------------------------------------
+    if logging.getLogger().handlers:
+        return
 
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    LOG_DIRECTORY.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    formatter = logging.Formatter(
+        LOG_FORMAT,
+    )
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(
+        formatter,
+    )
+
+    file_handler = logging.FileHandler(
+        LOG_FILE,
+        encoding="utf-8",
+    )
+
+    file_handler.setFormatter(
+        formatter,
+    )
+
+    root_logger = logging.getLogger()
+
+    root_logger.setLevel(
+        logging.INFO,
+    )
+
+    root_logger.addHandler(
+        console_handler,
+    )
+
+    root_logger.addHandler(
+        file_handler,
+    )
+
+    root_logger.info(
+        "Logging system initialized."
     )
